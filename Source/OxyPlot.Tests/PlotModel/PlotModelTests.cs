@@ -212,5 +212,39 @@ namespace OxyPlot.Tests
 
             Assert.That(plot.GetAxisOrDefault("ThisIsAnInvalidKey", defaultValue), Is.EqualTo(defaultValue));
         }
+
+        /// <summary>
+        /// To obtain the axis, consider the value of the property IsAxisVisible.
+        /// </summary>
+        [Test]
+        public void GetAxesFromPoint_PropertyIsAxisVisible()
+        {
+            var plot = new PlotModel { Title = "Get axes from point: consider property IsAxisVisible" };
+            var verticalAxis1 = new LinearAxis { Key = "YAxis1", Position = AxisPosition.Left, IsAxisVisible = true, PositionTier = 1 };
+            var verticalAxis2 = new LinearAxis { Key = "YAxis2", Position = AxisPosition.Left, IsAxisVisible = true, PositionTier = 2 };
+            var horizontalAxis1 = new LinearAxis { Key = "XAxis2", Position = AxisPosition.Bottom, IsAxisVisible = true, PositionTier = 1 };
+            var horizontalAxis2 = new LinearAxis { Key = "XAxis2", Position = AxisPosition.Bottom, IsAxisVisible = true, PositionTier = 2 };
+
+            var lineSeries1 = new LineSeries()
+            {
+                XAxisKey = "XAxis1",
+                YAxisKey = "YAxis1"
+            };
+            lineSeries1.Points.Add(new DataPoint(0, 1));
+            lineSeries1.Points.Add(new DataPoint(2, 3));
+
+            plot.Axes.Add(verticalAxis1);
+            plot.Axes.Add(verticalAxis2);
+            plot.Axes.Add(horizontalAxis1);
+            plot.Axes.Add(horizontalAxis2);
+
+            plot.Series.Add(lineSeries1);
+
+
+            plot.UpdateAndRenderToNull(800, 600);
+            plot.InvalidatePlot(true);
+            //plot.PlotArea;
+            throw new NotImplementedException("plot.PlotArea = zero, what to do?");
+        }
     }
 }
