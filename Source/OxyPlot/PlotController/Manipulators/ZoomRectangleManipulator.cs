@@ -10,6 +10,7 @@
 namespace OxyPlot
 {
     using System;
+    using System.Linq;
 
     /// <summary>
     /// Provides a manipulator for rectangle zooming functionality.
@@ -46,25 +47,27 @@ namespace OxyPlot
             {
                 return;
             }
-
             this.PlotView.SetCursorType(CursorType.Default);
             this.PlotView.HideZoomRectangle();
-            
+
             if (this.zoomRectangle.Width > 10 && this.zoomRectangle.Height > 10)
             {
-                var p0 = this.InverseTransform(this.zoomRectangle.Left, this.zoomRectangle.Top);
-                var p1 = this.InverseTransform(this.zoomRectangle.Right, this.zoomRectangle.Bottom);
-
-                if (this.XAxis != null)
+                PlotModel model = this.PlotView.ActualModel;
+                var xAxes = model.Axes.Where(axis => axis.IsHorizontal()).ToList();
+                var yAxes = model.Axes.Where(axis => axis.IsVertical()).ToList();
+                foreach (var xAxis in xAxes)
                 {
-                    this.XAxis.Zoom(p0.X, p1.X);
-                }
+                    var p0 = xAxis.InverseTransform(this.zoomRectangle.Left, this.zoomRectangle.Top, yAxes.First());
+                    var p1 = xAxis.InverseTransform(this.zoomRectangle.Right, this.zoomRectangle.Bottom, yAxes.First());
+                    xAxis.Zoom(p0.X, p1.X);
 
-                if (this.YAxis != null)
+                }
+                foreach (var yAxis in yAxes)
                 {
-                    this.YAxis.Zoom(p0.Y, p1.Y);
+                    var p0 = xAxes[0].InverseTransform(this.zoomRectangle.Left, this.zoomRectangle.Top, yAxis);
+                    var p1 = xAxes[0].InverseTransform(this.zoomRectangle.Right, this.zoomRectangle.Bottom, yAxis);
+                    yAxis.Zoom(p0.Y, p1.Y);
                 }
-
                 this.PlotView.InvalidatePlot();
             }
 
